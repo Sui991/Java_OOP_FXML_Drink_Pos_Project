@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"   xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+        <!-- Load icon library -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+        <title>Products</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 mb-2">
+                    <h1>飲料訂購選單</h1>
+                    <a href="/">回首頁</a>
+                    <a href="/cart">購物車</a>
+                </div>
+
+                <!-- show product -->
+                <div class="col-lg-9 mb-2">
+                    <div id="menuDisplay">
+                    </div>
+
+                </div> <!-- product list column -->
+
+                <!-- 過濾條件 -->
+                <div class="col-lg-3 mb-2">
+
+                    <div class="row">
+
+                        <!-- query criteria  card -->
+                        <div class="col-lg-12 mb-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="h6 text-uppercase mb-0">篩選條件</h3>
+                                </div>
+                                <div class="card-body">
+
+                                    <div class="row">
+
+                                        <div class="col-md-12">
+                                            <!-- Search form -->
+                                            <form  action="/searchProductByName" class="form-group">
+                                                <div class="input-group mb-2">
+
+                                                    <input type="search" name="name" class="form-control" placeholder="名稱關鍵字"/>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fa fa-search"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <!-- Search form -->
+                                            <form  th:action="@{/searchProductByPrice}" class="form-group">
+                                                <div class="input-group mb-2">
+
+                                                    <input type="search" name="price" class="form-control" placeholder="單價低於..."/>
+
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fa fa-search"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <!-- 種類 -->
+                                            <form  action="/searchProductByCate" class="form-group">
+
+                                                <div class="input-group">
+                                                    <select name="category" class="form-control">
+                                                        <option selected>果汁</option>
+                                                        <option>茶飲</option>
+                                                    </select>
+
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fa fa-search"></i>
+                                                    </button>
+
+                                                </div>
+
+                                            </form>
+                                        </div><!-- column -->
+
+                                    </div> <!-- row -->
+                                </div><!-- card body -->
+                            </div><!-- card -->
+
+                        </div><!-- column -->
+                        <!-- query criteria area -->
+                        
+                        <!--cart  content -->
+                        <div class="col-lg-12 mb-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="h6 text-uppercase mb-0">購物車</h3>
+                                </div>
+                                <div class="card-body">
+
+                                    <div id="cartContent" class="text-right">
+
+                                    </div>
+
+                                </div><!-- card body -->
+                            </div><!-- card -->
+
+                        </div><!-- column -->
+                        <!-- cart  content -->
+
+                    </div><!-- row in right column -->
+                </div><!-- 過濾條件 column -->
+
+
+
+            </div><!-- row in right column -->
+        </div><!-- right column -->
+
+        </div> <!-- row -->
+        </div><!-- container -->
+    </body>
+</html>
+
+<script>
+
+    // 字串格式函數 先載入 讓後面的程式可以使用
+    //Customize the String.format()
+    //reference: https://www.cnblogs.com/taoweiji/p/3260883.html
+
+    // let result = "{0}----{1}".format("xx","yy")
+    String.prototype.format = function () {
+        var result = this;
+        if (arguments.length == 0)
+            return null;
+        for (var i = 0; i < arguments.length; i++) {
+            var re = new RegExp('\\{' + (i) + '\\}', 'gm');
+            result = result.replace(re, arguments[i]);
+        }
+        return result;
+    };
+
+    // Another alternative way
+    // let result = String.format("{0}  {1}", "Apple","Pineapple")
+    String.format = function () {
+        if (arguments.length == 0)
+            return null;
+        var str = arguments[0];
+        for (var i = 1; i < arguments.length; i++) {
+            var re = new RegExp('\\{' + (i - 1) + '\\}', 'gm');
+            str = str.replace(re, arguments[i]);
+        }
+        return str;
+    };
+</script>
+
+
+<script th:inline="javascript">
+
+    let products = [[${products} ]];
+
+    //console.log(products);
+
+    // 顯示產品項目
+    const new_div = document.createElement('div');
+    new_div.className = 'row'; //要成為這樣: <div class="row"></div>
+
+    for (let i = 0; i < products.length; i++) {
+
+        let html_snippet = `
+                            <div class="col-md-3 col-sm-4 mt-2 mb-2">
+                                <a href="#">
+                                    <img height="100" width="120" class="rounded mb-md-0" src="http://127.0.0.1:8080/imgs/{0}">
+                                </a>
+
+                                <h5>{1} $ {2}</h5>
+        
+                                <form  action="/addToCart"  method="POST" class="form-group">
+                                    <div class="input-group">
+                                            <select name="quantity" class="form-control">
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-warning">+</button>
+                                            <input type="hidden" name="prod_id" value={3} />
+                                    </div>
+                                </form>
+        
+                            </div>`;
+
+        //填入資料
+        html_snippet = html_snippet.format(products[i].photo, products[i].name, products[i].price, products[i].product_id);
+        new_div.innerHTML += html_snippet;
+    }
+
+    // 一個大區塊附加上去
+    document.getElementById('menuDisplay').appendChild(new_div);
+
+    // 顯示 購物內容與總價
+    let items = [[${session.cart} ]];
+    const cartContent = document.getElementById('cartContent');
+
+    let sum = 0;
+    let snippet = "";
+    for (let i = 0; i < items.length; i++) {
+        let elem = String.format('<p>{0}  ${1}x{2}', items[i].product_name, items[i].product_price, items[i].quantity);
+        //let elem = '<p>{0}  ${1}x{2}'.format(items[i].product_name, items[i].product_price, items[i].quantity);
+        sum += items[i].product_price * items[i].quantity;
+        snippet += elem;
+    }
+    $('#cartContent').append(snippet);
+    $('#cartContent').append("<h4>總金額: $" + sum + "<h4>");
+
+</script>

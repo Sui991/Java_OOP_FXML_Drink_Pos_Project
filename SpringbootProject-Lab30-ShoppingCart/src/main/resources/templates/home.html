@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"   xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+        <!-- Load icon library -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <style>
+            .myborder {
+                border-radius: 15px;
+                background:#fbfcd2;
+                /* background: #E8FFC4; 顏色深一些 */
+                padding: 5px;
+                width: 160px;
+                height: 160px;
+            }
+        </style>
+        <title>產品清單</title>
+    </head>
+    <body>
+        <div class="container">
+
+
+            <div class="row">
+                <div class="col-lg-12 mb-2">
+                    <h1>QQ飲料店訂購選單</h1>
+                    <a href="/">回首頁</a>
+                    <a href="/cart">購物車</a>
+                </div>
+
+                <!-- show product -->
+                <div class="col-lg-9 mb-2">
+
+                    <div class="row">
+
+                        <th:block th:each="prod : ${products}">
+
+                            <div class="col mb-2 mr-2 myborder">
+
+                                <!-- 試試看幾種寫法 自訂myborder之大小會被調整
+                                <div class="mb-2 mr-2 myborder">
+                                <div class="col-sm-3 mb-2 mr-2 myborder">
+                                -->
+
+                                <div class="d-flex justify-content-center">
+
+                                    <a href="#">
+                                        <img title="很好喝啊！" height="80"  class="rounded mb-md-0" th:src="'http://127.0.0.1:8080/imgs/'+${prod.photo}">
+                                    </a>
+                                </div>
+
+                                <div class="d-flex justify-content-center">
+                                    <h6 th:text="${prod.name}+'$'+${prod.price}"></h6>
+                                </div>    
+
+
+                                <div class="d-flex justify-content-center">
+<!--   <button type="button" class="btn btn-info  btn-sm">成分</button>-->
+                                    <form  action="/addToCart"  method="POST" class="form-group">
+
+                                        <div class="input-group">
+
+                                            <select name="quantity" class="form-control form-control-sm">
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-outline-success  btn-sm">+</button>
+                                            <input type="hidden" name="prod_id" th:value="${prod.product_id}" />
+
+                                        </div>
+
+                                    </form>
+                                </div>
+
+
+
+                            </div> <!--product  column -->
+
+                        </th:block>
+                    </div><!-- row -->
+
+                </div> <!-- product list column -->
+
+
+                <!-- 過濾條件 -->
+                <div class="col-lg-3 mb-2">
+
+                    <div class="row">
+
+                        <!-- query criteria  card -->
+                        <div class="col-lg-12 mb-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="h6 text-uppercase mb-0">篩選條件</h3>
+                                </div>
+                                <div class="card-body">
+
+                                    <div class="row">
+
+                                        <div class="col-md-12">
+                                            <!-- Search form -->
+                                            <form  action="/searchProductByName" class="form-group">
+                                                <div class="input-group mb-2">
+
+                                                    <input type="search" name="name" class="form-control" placeholder="名稱關鍵字"/>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fa fa-search"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <!-- Search form -->
+                                            <form  th:action="@{/searchProductByPrice}" class="form-group">
+                                                <div class="input-group mb-2">
+
+                                                    <input type="search" name="price" class="form-control" placeholder="單價低於..."/>
+
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fa fa-search"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <!-- 種類 -->
+                                            <form  action="/searchProductByCate" class="form-group">
+
+                                                <div class="input-group">
+                                                    <select name="category" class="form-control">
+                                                        <option selected>果汁</option>
+                                                        <option>茶飲</option>
+                                                         <option>咖啡</option>  
+                                                    </select>
+
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fa fa-search"></i>
+                                                    </button>
+
+                                                </div>
+
+                                            </form>
+                                        </div><!-- column -->
+
+                                    </div> <!-- row -->
+                                </div><!-- card body -->
+                            </div><!-- card -->
+
+                        </div><!-- column -->
+                        <!-- query criteria area -->
+
+                        <!--cart  content -->
+                        <div class="col-lg-12 mb-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="h6 text-uppercase mb-0">購物車</h3>
+                                </div>
+                                <div class="card-body">
+
+                                    <th:block th:each="item:${session.cart}">
+                                        <p th:text="${item.product_name}+ '$'+${item.product_price}+',數量:'+ ${item.quantity}"></p>
+
+                                    </th:block>
+
+
+                                </div><!-- card body -->
+                            </div><!-- card -->
+
+                        </div><!-- column -->
+                        <!-- cart  content -->
+
+                    </div><!-- row in right column -->
+                </div><!-- 過濾條件 column -->
+
+            </div> <!-- row -->
+        </div><!-- container -->
+        
+    </body>
+</html>
+
